@@ -43,7 +43,7 @@ public class ListaPrevisaoAdapter extends ArrayAdapter<Previsao> {
         //todo Buscar icone utilizando Glide em conjunto com URL base de icones
         Glide
                 .with(getContext())
-                .load(Utils.URL_ICONE+previsao.getIcone()+".png")
+                .load(String.format(Utils.URL_ICONE,previsao.getIcone()))
                 .into(ivIcone);
 
 

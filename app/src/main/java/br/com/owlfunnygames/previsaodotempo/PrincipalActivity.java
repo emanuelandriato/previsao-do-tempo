@@ -34,6 +34,7 @@ public class PrincipalActivity extends AppCompatActivity {
     List<Previsao> previsoes = new ArrayList<Previsao>();
     TextView tvTemperaturaHoje;
     TextView tvPeriodoHoje;
+    TextView tvCidade;
     ImageView ivIconeHoje;
 
     @Override
@@ -44,7 +45,9 @@ public class PrincipalActivity extends AppCompatActivity {
         listViewPrevisoes = (ListView) findViewById(R.id.previsoesListView);
         tvTemperaturaHoje = (TextView) findViewById(R.id.textViewTempHoje);
         tvPeriodoHoje = (TextView) findViewById(R.id.textViewPeriodoHoje);
+        tvCidade = (TextView) findViewById(R.id.textViewCidade);
         ivIconeHoje = (ImageView) findViewById(R.id.imageViewIconeHoje);
+
 
         PrevisaoAsyncTask p = new PrevisaoAsyncTask();
         p.execute();
@@ -59,11 +62,12 @@ public class PrincipalActivity extends AppCompatActivity {
             }
         });
 
-        //DownloadImageTask d = new DownloadImageTask();
-        //d.execute(Utils.URL_PREVISOES);
+        /* JÁ ESTÁ BUSCANDO PELO GLIDE, PASSOU A SER DESNECESSÁRIO
+        DownloadImageTask d = new DownloadImageTask();
+        d.execute(Utils.URL_PREVISOES);
         //todo Criar um novo objeto do AsyncTask customizado
         //todo Executar o AsyncTask
-
+        */
     }
 
     public class DownloadImageTask extends AsyncTask<String, String, Bitmap> {
@@ -134,18 +138,18 @@ public class PrincipalActivity extends AppCompatActivity {
                     List<Previsao> previsoes = new ArrayList<>();
                     Previsao previsaoTemp;
                     JSONArray listaPrevisoes = jsonObject.getJSONArray("list");
+
                     for (int i = 1; i < listaPrevisoes.length(); i++) {
                         previsaoTemp = new Previsao();
-                            previsaoTemp.setPeriodo(listaPrevisoes.getJSONObject(i).getLong("dt") * 1000);
+                        previsaoTemp.setPeriodo(listaPrevisoes.getJSONObject(i).getLong("dt") * 1000);
                         previsaoTemp.setTemperatura(listaPrevisoes.getJSONObject(i).getJSONObject("temp").getDouble("day") + "°");
                         previsaoTemp.setIcone(listaPrevisoes.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon"));
+                        previsaoTemp.setDescricao(listaPrevisoes.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("description"));
+                        previsoes.add(previsaoTemp);
 
                         //todo Preencher atributo descricao buscando o dado em weather->description
-                        previsaoTemp.setDescricao(listaPrevisoes.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("description"));
-
                         //todo BUG descobrir o que falta aqui
                         //FALTA PERMISSOES NO MANISFESTO E ADICIONAR AS PREVISOES NA LISTA RETORNADA
-                        previsoes.add(previsaoTemp);
                     }
                     return previsoes;
                 } else {
@@ -183,9 +187,10 @@ public class PrincipalActivity extends AppCompatActivity {
         //Aqui atualizamos a previsão principal fora do ListView (confira os nomes das variáveis)
         tvTemperaturaHoje.setText(previsaoDestaque.getTemperatura());
         tvPeriodoHoje.setText(previsaoDestaque.getPeriodo());
+        tvCidade.setText("Fortaleza, CE");
 
         //todo Buscar icone do tempo com GLIDE aqui (Após finalizar e testar AsyncTask)
-        String urlIcon = Utils.URL_ICONE+previsaoDestaque.getIcone()+".png";
+        String urlIcon = String.format(Utils.URL_ICONE,previsaoDestaque.getIcone());
         Glide
                 .with(this)
                 .load(urlIcon)
